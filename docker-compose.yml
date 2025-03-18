@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_api_development
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db/test_api_development
+    volumes:
+      - bundle_cache:/usr/local/bundle
+      - ./api:/test_api
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./ui:/test_ui
+
+volumes: 
+  bundle_cache:
