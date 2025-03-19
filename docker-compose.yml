@@ -19,17 +19,20 @@ services:
     volumes:
       - bundle_cache:/usr/local/bundle
       - ./api:/test_api
+    command: bash -c "rm -f /test_api/tmp/pids/server.pid && bin/rails server -b 0.0.0.0"
 
   ui:
     build:
       context: ./ui
       dockerfile: Dockerfile
     ports:
-      - "8080:3000"
+      - "7500:3000"
     depends_on:
       - api
     volumes:
       - ./ui:/test_ui
-
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
 volumes: 
   bundle_cache:
