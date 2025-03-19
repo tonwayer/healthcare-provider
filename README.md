@@ -21,37 +21,91 @@ The next steps will get you started with setting up the repository, while the [E
    docker compose up --build
    ```
 
-3. Access the applications:
+3. Run Database Migrations
+   ```sh
+   docker compose exec api rails db:migrate
+   ```
+4. Create a User for Authentication
+   ```sh
+   docker compose exec api rails console
+   User.create!(email: "admin@example.com", password: "password123", password_confirmation: "password123")
+   ```
+
+5. Env for UI
+Create .env in /ui
+   ```sh
+   docker compose exec api rails console
+   user = User.find_by(email: "test@example.com")
+   user.api_token
+   ```
+Copy user.api_token and set to NEXT_PUBLIC_API_TOKEN.
+Adn set NEXT_PUBLIC_API_URL to http://localhost:3000
+
+6. Access the applications:
    - Rails API: http://localhost:3000
-   - React UI: http://localhost:8080
+   - React UI: http://localhost:7500
 
-You can now start coding your submission for the take-home exercise.
+## Tests
+- UI: ```docker compose exec ui npm test```
+- API: ```docker compose exec api bundle exec rspec```
 
-**Note:** Please refer to the [EXERCISE.md](./EXERCISE.md) file for detailed requirements and guidelines for the assignment.
+## API Endpoints
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | /providers | Get all active providers |
+| GET | /providers/{id} | Get provider by ID |
+| POST | /providers | Create a new provider |
+| PUT | /providers/{id} | Update a provider |
+| DELETE | /providers/{id} | Soft delete a provider |
+| PUT | /providers/{id}/reactivate | Reactivate a provider |
 
-## Project Initialization (For Maintainers)
+## DB Schema
+| User |  |
+| --- | --- |
+| id | int |
+| string | email |
+| string | password\_digest |
+| string | api\_token |
+| timestamp | created\_at |
+| timestamp | updated\_at |
 
-The `docker-compose.initialize.yml` file is used to create the base Rails and React applications. These steps have been performed and the resulting applications have been committed to the repository. If you need to re-initialize one of the applications (e.g., to use a new version of Rails or React), follow these steps:
+| Provider |  |
+| --- | --- |
+| int | id |
+| string | name |
+| string | speciality |
+| string | npi |
+| string | location |
+| string | credentials |
+| boolean | deactivated |
+| timestamp | created\_at |
+| timestamp | updated\_at |
 
-1. Clone the repository:
-   ```sh
-   git clone <repository-url>
-   cd software-engineering-code-exercise
-   ```
+## System Design
 
-2. Run the initialization compose file:
-   ```sh
-   docker compose -f docker-compose.initialize.yml up --build
-   ```
+```mermaid
+graph TD;
+  User[User] -->|Sends Request| UI;
+  UI -->|API Call| API[Ruby on Rails API];
+  API -->|Fetches Data| DB[PostgreSQL Database];
+  API -->|Handles Authentication| Auth[Token-based Authentication];
 
-3. Once the initialization is complete, the `ui` and `api` directories will be set up with boilerplate Rails and React applications. You can then commit these changes to the repository.
+  subgraph Backend
+    API
+    DB
+    Auth
+  end
 
-For normal usage, after the initial setup, you can simply pull the repository and run the default `docker-compose.yml` file as described in the Candidate Instructions section.
+  subgraph Frontend
+    UI
+  end
 
-## Facilitator Instructions
+  UI -->|Displays Providers| User;
+  API -->|Sends Response| UI;
+```
 
-To enable candidates to work on the exercise, follow these steps:
-
-1. Download a zip file of the repository.
-2. Email the zip file to the candidate.
-3. After the candidate completes the exercise, they should email their solution back as a zip file.
+## Missing & future implementation
+- Only admin account: There is no role based permission logic and 
+- Limited Pagination: The API does not implement pagination yet.
+- Basic Authentication: Manual user creating and token set
+- No Rate Limiting: Does not include request throttling.
