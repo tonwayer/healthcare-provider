@@ -1,7 +1,7 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export async function apiRequest(endpoint: string, method = "GET", data?: any) {
-  const token = "6zV9KR5cTQPzQNpAxMLbi5mh";
+  const token = process.env.NEXT_PUBLIC_API_TOKEN;
 
   const options: RequestInit = {
     method,

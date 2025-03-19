@@ -40,26 +40,37 @@ export default function Home() {
 
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold">Healthcare Providers</h1>
+      <h1 className="text-2xl font-bold" role="heading">
+        Healthcare Providers
+      </h1>
+
       <Link href="/providers/new" className="bg-green-500 text-white p-2 rounded inline-block mt-4">
         Add New Provider
       </Link>
 
       <div className="flex gap-4 mt-4">
-        <input type="text" placeholder="Search by name" className="border p-2 w-full rounded" value={search} onChange={(e) => setSearch(e.target.value)} />
-        <input type="text" placeholder="Filter by specialty" className="border p-2 w-full rounded" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
-        <input type="text" placeholder="Filter by location" className="border p-2 w-full rounded" value={location} onChange={(e) => setLocation(e.target.value)} />
+        <label htmlFor="search" className="sr-only">Search by name</label>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search by name"
+          className="border p-2 w-full rounded"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search providers by name"
+        />
       </div>
 
-      <ul className="mt-4 space-y-2">
+      <ul className="mt-4 space-y-2" role="list">
         {filteredProviders.map((provider) => (
-          <li key={provider.id} className="border p-3 rounded-lg shadow-sm">
-            <Link href={`/providers/${provider.id}`}>
+          <li key={provider.id} className="border p-3 rounded-lg shadow-sm" role="listitem">
+            <Link href={`/providers/${provider.id}`} aria-label={`View details for ${provider.name}`}>
               <strong>{provider.name}</strong> - {provider.specialty} ({provider.location})
             </Link>
           </li>
         ))}
       </ul>
     </main>
+
   );
 }
